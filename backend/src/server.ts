@@ -1,6 +1,7 @@
 import app from "./app";
 import {env} from "./config/env";
 import { connectDB } from "./database/mongodb";
+import logger from "./shared/logger/logger";
 
 
 const startServer = async () => {
@@ -8,10 +9,10 @@ const startServer = async () => {
         await connectDB();
 
         app.listen(env.port, () => {
-            console.log(`🚀 Server running on http://localhost:${env.port}`);
+            logger.info(`🚀 Server running on http://localhost:${env.port}`);
         });
     } catch(error){
-        console.error("Failed to start server", error);
+        logger.error("Failed to start server", error);
         process.exit(1);
     }
 };
