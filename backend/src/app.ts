@@ -6,6 +6,8 @@ import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/error.middleware";
 import { sendSuccess } from "./shared/responses/apiResponse";
 import authRoutes from "./modules/auth/auth.routes";
+import userRoutes from "./modules/user/user.routes";
+import resumeRoutes from "./modules/resume/resume.routes";
 
 const app = express();
 
@@ -16,6 +18,8 @@ app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(morgan("dev"));
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/resumes", resumeRoutes);
 
 app.get("/api/v1/health", (req, res) => {
     return sendSuccess({

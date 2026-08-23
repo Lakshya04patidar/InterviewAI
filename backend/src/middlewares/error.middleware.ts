@@ -14,6 +14,9 @@ export const errorHandler = (
 
     logger.error(`${req.method} ${req.originalUrl} - ${statusCode} - ${message}`);
 
+    if(!(error instanceof AppError)){
+        console.error("Actual ERROR: ", error);
+    }
     res.status(statusCode).json({
         success: false,
         message,
