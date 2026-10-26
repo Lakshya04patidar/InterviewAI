@@ -89,3 +89,23 @@ export const remove = async (
         message: "Resume deleted successfully",
     });
 };
+
+export const removeResume = async(
+    req: Request,
+    res: Response
+) => {
+    if(!req.user){
+        throw new AppError("Authentication required", 401);
+    }
+
+    const resumeId = req.params.id as string;
+
+    await deleteResume(req.user.id, resumeId);
+
+    return sendSuccess({
+        res,
+        statusCode: 200,
+        message: "Resume deleted successfully",
+        data: null,
+    });
+};

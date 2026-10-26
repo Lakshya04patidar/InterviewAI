@@ -127,3 +127,23 @@ export const analyzeResume = async (
 
   return analysis;
 };
+
+export const getResumeAnalysis = async (
+  userId: string,
+  resumeId: string
+) => {
+  if(!Types.ObjectId.isValid(resumeId)){
+    throw new AppError("Invalid resume ID", 400);
+  }
+
+  const analysis = await ResumeAnalysis.findOne({
+    resumeId: new Types.ObjectId(resumeId),
+    userId: new Types.ObjectId(userId),
+  });
+
+  if(!analysis){
+    throw new AppError("Resume analysis not found", 404);
+  }
+
+  return analysis;
+};
