@@ -2,6 +2,7 @@ import { Resume } from "./resume.model";
 import { CreateResumeInput } from "./resume.validation";
 import { AppError } from "../../shared/errors/AppError";
 import { Types } from "mongoose";
+import { parseResumeFile } from "./resume.parser";
 
 export const createResume = async (
   userId: string,
@@ -13,21 +14,40 @@ export const createResume = async (
     fileUrl: input.fileUrl,
     fileType: input.fileType,
     fileSize: input.fileSize,
-    status: "uploaded",
+    status: "processing",
   });
 
   await resume.save();
 
-  return {
-    id: resume._id,
-    userId: resume.userId,
-    fileName: resume.fileName,
-    fileUrl: resume.fileUrl,
-    fileType: resume.fileType,
-    fileSize: resume.fileSize,
-    status: resume.status,
-    createdAt: resume.createdAt,
-  };
+  try {
+    const parsedText = await parseResumeFile(
+      input.filePath,
+      input.fileType
+    );
+
+    resume.parsedText = parsedText;
+    resume.status = "completed";
+
+    await resume.save();
+
+    return {
+      id: resume._id,
+      userId: resume.userId,
+      fileName: resume.fileName,
+      fileUrl: resume.fileUrl,
+      fileType: resume.fileType,
+      fileSize: resume.fileSize,
+      status: resume.status,
+      parsedText: resume.parsedText,
+      createdAt: resume.createdAt,
+    };
+  } catch (error) {
+    resume.status = "failed";
+
+    await resume.save();
+
+    throw error;
+  }
 };
 
 export const getUserResumes = async (userId: string) => {

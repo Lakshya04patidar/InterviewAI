@@ -17,6 +17,10 @@ export const createResumeSchema = z.object({
     fileSize: z
         .number()
         .positive("File size must be greater than 0"),
+
+    filePath: z
+        .string()
+        .min(1, "File path is required"),
 });
 
 export type CreateResumeInput = z.infer<typeof createResumeSchema>;

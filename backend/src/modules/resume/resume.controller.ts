@@ -1,23 +1,26 @@
-import { Request, Response, ParamsDictionary } from "express-serve-static-core";
+import { Request, Response } from "express-serve-static-core";
 import { AppError } from "../../shared/errors/AppError";
 import { sendSuccess } from "../../shared/responses/apiResponse";
-import { createResumeSchema } from "./resume.validation";
 import { createResume, getUserResumes, getResumeById, deleteResume } from "./resume.service";
 
-export const create = async(
-    req: Request,
-    res: Response
-) => {
+export const create = async(req: Request, res: Response) => {
     if(!req.user){
         throw new AppError("Authentication required", 401);
     }
 
-    const validatedData = createResumeSchema.parse(req.body);
+    if(!req.file){
+        throw new AppError("Resume file is required", 400);
+    }
 
-    const resume = await createResume(
-        req.user.id,
-        validatedData
-    );
+    const file = req.file;
+
+    const resume = await createResume(req.user.id, {
+        fileName: file.originalname,
+        fileUrl: `/uploads/resumes/${file.filename}`,
+        fileType: file.mimetype,
+        fileSize: file.size,
+        filePath: file.path,
+    });
 
     return sendSuccess({
         res,
